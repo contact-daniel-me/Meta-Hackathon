@@ -1,0 +1,180 @@
+# OpenEnv Configuration for EV Charging Station Environment
+# This file defines the environment specification for OpenEnv compatibility
+
+# Environment metadata
+metadata:
+  name: "ev-charging-station-optimization"
+  version: "1.0.0"
+  description: "AI agent learns to optimize EV charging station selection based on distance, cost, and availability"
+  author: "OpenEnv Environment Team"
+  tags: ["electric-vehicle", "charging", "optimization", "reinforcement-learning"]
+  license: "MIT"
+
+# Entry point for OpenEnv
+entry_point: "environment:EVChargingEnvironment"
+
+# Environment specification
+environment:
+  # Main environment module and class
+  module: "environment"
+  class: "EVChargingEnvironment"
+  
+  # Models module
+  models:
+    module: "models"
+    observation: "Observation"
+    action: "Action"
+    reward: "Reward"
+  
+  # Required methods
+  methods:
+    - "step"
+    - "reset"
+    - "state"
+
+# Task definitions
+tasks:
+  easy:
+    name: "Nearest Station Selection"
+    description: "Select the nearest available charging station to minimize travel distance"
+    module: "tasks"
+    config_function: "get_easy_task"
+    grader_function: "easy_grader"
+    max_score: 1.0
+    difficulty: "easy"
+    
+  medium:
+    name: "Cost and Time Optimization"
+    description: "Optimize charging station selection considering cost, waiting time, and distance"
+    module: "tasks"
+    config_function: "get_medium_task"
+    grader_function: "medium_grader"
+    max_score: 1.0
+    difficulty: "medium"
+    
+  hard:
+    name: "Multi-user Priority Scheduling"
+    description: "Manage charging in a competitive environment with limited stations and priority-based access"
+    module: "tasks"
+    config_function: "get_hard_task"
+    grader_function: "hard_grader"
+    max_score: 1.0
+    difficulty: "hard"
+
+# Grader configuration
+grader:
+  module: "grader"
+  class: "EVChargingGrader"
+  validation:
+    required_fields: ["difficulty", "actions"]
+    action_types: ["select_station", "wait", "move_to_next_station"]
+
+# Inference configuration
+inference:
+  module: "inference"
+  class: "InferenceRunner"
+  supported_models:
+    - "gpt-4"
+    - "gpt-3.5-turbo"
+  default_model: "gpt-4"
+  api_required: true
+  api_provider: "openai"
+
+# Dependencies
+dependencies:
+  python: ">=3.8"
+  packages:
+    - "pydantic>=2.0.0"
+    - "numpy>=1.24.0"
+    - "openai>=1.0.0"
+
+# Docker configuration
+docker:
+  build_context: "."
+  dockerfile: "Dockerfile"
+  base_image: "python:3.10-slim"
+  
+# Testing
+testing:
+  test_module: "tests"
+  test_files:
+    - "test_models.py"
+    - "test_environment.py"
+    - "test_tasks.py"
+    - "test_grader.py"
+  coverage_threshold: 80
+
+# Documentation
+documentation:
+  readme: "README.md"
+  examples:
+    - "examples/basic_usage.py"
+    - "examples/custom_agent.py"
+  api_docs: "docs/api.md"
+
+# Validation rules
+validation:
+  observation_schema:
+    required:
+      - "ev"
+      - "stations"
+      - "current_location_lat"
+      - "current_location_lon"
+      - "destination_lat"
+      - "destination_lon"
+      - "time_remaining_hours"
+      - "budget_remaining"
+      - "step_count"
+      - "max_steps"
+      - "other_evs_waiting"
+  
+  action_schema:
+    required:
+      - "type"
+    optional:
+      - "station_id"
+      - "wait_time_minutes"
+    type_enum:
+      - "select_station"
+      - "wait"
+      - "move_to_next_station"
+  
+  reward_schema:
+    required:
+      - "value"
+      - "breakdown"
+      - "done"
+      - "info"
+
+# Performance metrics
+metrics:
+  primary: "grade"
+  secondary:
+    - "total_reward"
+    - "steps_taken"
+    - "final_score"
+    - "episode_done"
+  
+# Environment limits
+limits:
+  max_steps_per_episode: 50
+  max_episode_time_seconds: 300
+  max_memory_mb: 512
+
+# Integration settings
+integration:
+  openenv_version: ">=1.0.0"
+  compatible_platforms:
+    - "linux"
+    - "darwin"
+    - "win32"
+  
+# Security and privacy
+security:
+  requires_api_key: true
+  api_key_env_var: "OPENAI_API_KEY"
+  data_privacy: "public"
+  external_apis:
+    - name: "OpenAI"
+      purpose: "AI inference"
+      required: true
