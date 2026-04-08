@@ -1,3 +1,13 @@
+---
+title: Ev Openenv
+emoji: 🚀
+colorFrom: green
+colorTo: pink
+sdk: docker
+app_file: app.py
+pinned: false
+---
+
 # EV Charging Station Optimization Environment
 
 An OpenEnv-compatible environment where AI agents learn to optimize electric vehicle (EV) charging station selection based on distance, cost, availability, and time constraints.
