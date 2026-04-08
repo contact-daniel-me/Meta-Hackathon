@@ -27,7 +27,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Create logs directory
-RUN mkdir -p logs
+RUN mkdir -p logs && \
+    useradd -m -u 1000 user && \
+    chown -R user:user /app
+
+USER user
 
 # Set permissions
 RUN chmod +x *.py
@@ -40,4 +44,4 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD python -c "import models, environment, tasks, grader, inference" || exit 1
 
 # Default command for Hugging Face Spaces
-CMD ["python", "inference.py", "--help"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7860"]
