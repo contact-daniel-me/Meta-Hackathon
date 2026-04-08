@@ -27,7 +27,7 @@ dependencies = [
 Homepage = "https://github.com/contact-daniel-me/Meta-Hackathon"
 
 [project.scripts]
-server = "server.app:app"
+server = "server.app:main"
 
 [tool.setuptools]
 package-dir = {"" = "."}

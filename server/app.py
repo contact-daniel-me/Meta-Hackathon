@@ -188,6 +188,11 @@ async def get_state_get(difficulty: str = "easy"):
         raise HTTPException(status_code=500, detail=f"State failed: {str(e)}")
 
 
-if __name__ == "__main__":
+def main():
+    """Main entry point for starting the server."""
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=7860)
+
+
+if __name__ == "__main__":
+    main()
