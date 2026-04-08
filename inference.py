@@ -301,7 +301,7 @@ class InferenceRunner:
         with open(output_file, 'w') as f:
             json.dump(results, f, indent=2)
         
-        self.logger.info(f"Results saved to {output_file}")
+        logger.info(f"Results saved to {output_file}")
         print(f"Results saved to {output_file}")
 
 

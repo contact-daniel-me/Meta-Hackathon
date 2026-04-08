@@ -44,4 +44,4 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD python -c "import models, environment, tasks, grader, inference" || exit 1
 
 # Default command for Hugging Face Spaces
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7860"]
+CMD ["uvicorn", "server.app:app", "--host", "0.0.0.0", "--port", "7860"]

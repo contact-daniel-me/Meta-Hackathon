@@ -1,0 +1,40 @@
+﻿git : remote: [31m-------
+--------------------------
+--------------------------
+--------------[0m        
+At line:1 char:1
++ git push -f https://Dani
+elsesu:hf_uKcoZMxawdJprYyB
+zKYuUObETfllbrhBOv@ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (r  
+  emote: [31m--...---   
+ [0m        :String) [    
+], RemoteException
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+remote: [31mYou are not 
+authorized to push to 
+this repo.[0m        
+remote: [31mMake sure 
+that you are properly 
+logged in.[0m        
+remote: [31m-------------
+--------------------------
+--------------------------
+--------[0m        
+To https://huggingface.co/
+spaces/Danielsesu/ev-opene
+nv.git
+ ! [remote rejected] main 
+-> main (pre-receive hook 
+declined)
+error: failed to push 
+some refs to 'https://hugg
+ingface.co/spaces/Danielse
+su/ev-openenv.git'
