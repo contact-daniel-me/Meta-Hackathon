@@ -295,8 +295,7 @@ class InferenceRunner:
             output_file: Output file path (auto-generated if None)
         """
         if output_file is None:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            output_file = f"inference_results_{self.difficulty}_{timestamp}.json"
+            output_file = f"submission.json"
         
         with open(output_file, 'w') as f:
             json.dump(results, f, indent=2)
@@ -316,12 +315,21 @@ def main():
     
     parser = argparse.ArgumentParser(description="Run EV charging inference")
     parser.add_argument("difficulty", choices=["easy", "medium", "hard"], 
+                       nargs='?', default=os.getenv("TASK_DIFFICULTY", "easy"),
                        help="Task difficulty level")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
     parser.add_argument("--output", help="Output file for results")
     parser.add_argument("--max-steps", type=int, help="Maximum steps (overrides task config)")
     
     args = parser.parse_args()
+    
+    # Log configuration
+    logger.info(f"Starting inference with difficulty: {args.difficulty}")
+    logger.info(f"Seed: {args.seed}")
+    if args.output:
+        logger.info(f"Output file: {args.output}")
+    if args.max_steps:
+        logger.info(f"Max steps: {args.max_steps}")
     
     try:
         # Create runner
@@ -349,7 +357,11 @@ def main():
             print(f"Error: {results['error']}")
         
     except Exception as e:
-        print(f"Error: {e}")
+        import traceback
+        logger.error(f"Unhandled exception in main: {e}")
+        logger.error(traceback.format_exc())
+        print(f"Error: {e}", flush=True)
+        traceback.print_exc()
         sys.exit(1)
 
 
