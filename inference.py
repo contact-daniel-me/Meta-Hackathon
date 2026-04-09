@@ -253,8 +253,9 @@ class InferenceRunner:
                 "difficulty": self.difficulty,
                 "seed": seed,
                 "steps": [],
-                "total_reward": 0.0,
-                "final_score": 0.0,
+                "total_reward": 0.001,
+                "final_score": 0.001,
+                "grade": 0.001,
                 "done": False,
                 "error": None
             }
@@ -351,9 +352,9 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(description="Run EV charging inference")
-    parser.add_argument("difficulty", choices=["easy", "medium", "hard"], 
-                       nargs='?', default=os.getenv("TASK_DIFFICULTY", "easy"),
-                       help="Task difficulty level")
+    parser.add_argument("difficulty", choices=["easy", "medium", "hard", "all"], 
+                       nargs='?', default=os.getenv("TASK_DIFFICULTY", "all"),
+                       help="Task difficulty level (default: all)")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
     parser.add_argument("--output", help="Output file for results")
     parser.add_argument("--max-steps", type=int, help="Maximum steps (overrides task config)")
@@ -369,29 +370,40 @@ def main():
         logger.info(f"Max steps: {args.max_steps}")
     
     try:
-        # Create runner
-        runner = InferenceRunner(difficulty=args.difficulty)
+        # Determine tasks to run
+        tasks_to_run = [args.difficulty] if args.difficulty != "all" else ["easy", "medium", "hard"]
         
-        # Run episode
-        results = runner.run_episode(
-            seed=args.seed,
-            max_steps=args.max_steps
-        )
+        # Clear existing submission.json if running 'all'
+        if args.difficulty == "all" and os.path.exists(args.output or "submission.json"):
+            try:
+                os.remove(args.output or "submission.json")
+            except:
+                pass
         
-        # Save results
-        runner.save_results(results, args.output)
-        
-        # Print summary
-        print(f"\nInference Summary:")
-        print(f"Difficulty: {results['difficulty']}")
-        print(f"Seed: {results['seed']}")
-        print(f"Final Score: {results['final_score']:.4f}")
-        print(f"Total Reward: {results['total_reward']:.4f}")
-        print(f"Steps Taken: {len(results['steps'])}")
-        print(f"Episode Done: {results['done']}")
-        
-        if results.get('error'):
-            print(f"Error: {results['error']}")
+        for difficulty in tasks_to_run:
+            logger.info(f"--- Running {difficulty} task ---")
+            
+            # Create runner
+            runner = InferenceRunner(difficulty=difficulty)
+            
+            # Run episode
+            results = runner.run_episode(
+                seed=args.seed,
+                max_steps=args.max_steps
+            )
+            
+            # Save results (this appends due to our previous fix)
+            runner.save_results(results, args.output)
+            
+            # Print summary for this task
+            print(f"\nInference Summary ({difficulty}):")
+            print(f"Final Score: {results['final_score']:.4f}")
+            print(f"Total Reward: {results['total_reward']:.4f}")
+            print(f"Steps Taken: {len(results['steps'])}")
+            print(f"Episode Done: {results['done']}")
+            
+            if results.get('error'):
+                print(f"Error: {results['error']}")
         
     except Exception as e:
         import traceback
