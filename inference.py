@@ -314,6 +314,8 @@ class InferenceRunner:
             episode_data["final_score"] = _clamp_score(final_state.score)
             episode_data["grade"] = _clamp_score(grade_task(final_state))
             episode_data["total_reward"] = _clamp_score(episode_data["total_reward"])
+            episode_data["steps_taken"] = len(episode_data["steps"])
+            episode_data["episode_done"] = bool(final_state.done)
 
             print("[END]")
             

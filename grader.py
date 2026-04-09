@@ -193,9 +193,15 @@ def main():
     """Main entry point for command-line grading."""
     if len(sys.argv) < 2:
         print("Usage: python grader.py <submission_file.json>")
+        print("   OR: python grader.py <difficulty> <submission_file.json>")
         sys.exit(1)
         
-    submission_file = sys.argv[1]
+    if len(sys.argv) == 2:
+        submission_file = sys.argv[1]
+        difficulty = "all"
+    else:
+        difficulty = sys.argv[1]
+        submission_file = sys.argv[2]
     
     try:
         with open(submission_file, 'r') as f:
