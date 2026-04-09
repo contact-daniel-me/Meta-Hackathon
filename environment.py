@@ -53,11 +53,12 @@ class EVChargingEnvironment:
         """Map any reward (positive or negative) to (0.001, 0.999) range."""
         # Simple mapping: positive values stay mostly same, negative values become very small positive
         if val > 0:
-            return min(0.999, val + 0.05) if val < 0.1 else min(0.999, val)
+            return min(0.999, float(val) + 0.05) if val < 0.1 else min(0.999, float(val))
         else:
             return 0.001 # All penalties are now very small positive rewards
-        
-        # Performance tracking
+
+    def _init_performance_tracking(self):
+        """Initialize performance tracking metrics."""
         self.total_distance_traveled = 0.0
         self.total_waiting_time = 0.0
         self.total_charging_cost = 0.0
@@ -549,4 +550,5 @@ class EVChargingEnvironment:
 
         total_score = sum(score_components.values())
         # Strictly enforce (0.001, 0.999) — never exactly 0 or 1
-        return min(0.999, max(0.001, total_score))
+        # Round to 4 decimal places first to avoid float precision artifacts
+        return max(0.001, min(0.999, round(float(total_score), 4)))

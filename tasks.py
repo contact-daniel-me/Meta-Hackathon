@@ -1,8 +1,4 @@
-"""
-Task definitions and deterministic graders for EV Charging Environment.
-
-This module defines three difficulty levels with corresponding tasks and grader functions.
-Each task has a clear objective and returns a score between 0.0 and 1.0.
+Each task has a clear objective and returns a score strictly between 0.001 and 0.999.
 """
 
 from typing import Dict, List, Any, Tuple
