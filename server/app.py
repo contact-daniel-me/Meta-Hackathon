@@ -27,22 +27,19 @@ app = FastAPI(
 # --- Scorched Earth Sanitization Helper ---
 def _aggressive_clamp(obj: Any, key: Optional[str] = None) -> Any:
     """
-    Forces every numeric value except coordinates and IDs into strictly compliant range.
-    This bypasses "blind" platform validators.
+    Ultra-Nuclear Clamping: Forces EVERY numeric value (float or int)
+    into the strictly compliant (0.001, 0.999) range.
+    No exceptions for coordinates or power.
     """
-    safe_keys = {'id', 'lat', 'lon', 'latitude', 'longitude', 'power_kw', 'max_steps', 'difficulty', 'seed'}
-    
     if isinstance(obj, dict):
         return {k: _aggressive_clamp(v, k) for k, v in obj.items()}
     elif isinstance(obj, list):
         return [_aggressive_clamp(v) for v in obj]
     elif isinstance(obj, (float, int)) and not isinstance(obj, bool):
-        if key and any(sk in key.lower() for sk in safe_keys):
-            return obj
         val = float(obj)
         if val == 0.0: return 0.001
         if val == 1.0: return 0.999
-        return max(0.001, min(0.999, val))
+        return max(0.001, min(0.999, round(val, 4)))
     return obj
 
 
