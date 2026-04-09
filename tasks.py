@@ -1,3 +1,4 @@
+"""
 Each task has a clear objective and returns a score strictly between 0.001 and 0.999.
 """
 
