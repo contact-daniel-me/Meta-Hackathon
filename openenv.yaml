@@ -4,7 +4,7 @@
 # Environment metadata
 metadata:
   name: "ev-charging-station-optimization"
-  version: "1.0.0"
+  version: "1.0.1"
   description: "AI agent learns to optimize EV charging station selection based on distance, cost, and availability"
   author: "OpenEnv Environment Team"
   tags: ["electric-vehicle", "charging", "optimization", "reinforcement-learning"]

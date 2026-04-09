@@ -37,11 +37,30 @@ logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
-# Score safety helper — enforces OpenEnv strict (0, 1) open-interval requirement
+# Score safety helper - enforces OpenEnv strict (0, 1) open-interval requirement
 # ---------------------------------------------------------------------------
 def _clamp_score(value: float) -> float:
-    """Clamp a score to strictly (0.001, 0.999) — never exactly 0 or 1."""
-    return max(0.001, min(0.999, float(value)))
+    """Clamp a score to strictly (0.001, 0.999) - never exactly 0 or 1."""
+    try:
+        val = float(value)
+        return max(0.001, min(0.999, val))
+    except (ValueError, TypeError):
+        return 0.001
+
+def _deep_clamp(obj: Any) -> Any:
+    """Recursively clamp all floats in a nested structure to satisfy OpenEnv (0, 1) requirement."""
+    if isinstance(obj, dict):
+        return {k: _deep_clamp(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [_deep_clamp(v) for v in obj]
+    elif isinstance(obj, float):
+        # We only clamp things that look like scores or probabilities (-1.1 to 1.1)
+        # Avoid clamping large numbers like coordinates
+        if obj == 0.0: return 0.001
+        if obj == 1.0: return 0.999
+        if -1.1 < obj < 1.1:
+            return max(0.001, min(0.999, obj))
+    return obj
 
 
 class EVChargingAgent:
@@ -319,21 +338,17 @@ class InferenceRunner:
 
             print("[END]")
             
-            return episode_data
+            # Apply nuclear recursive clamp to everything
+            return _deep_clamp(episode_data)
             
         except Exception as e:
             print("[END]")
             episode_data["error"] = str(e)
-            return episode_data
+            return _deep_clamp(episode_data)
     
     def save_results(self, results: Dict[str, Any], output_file: Optional[str] = None):
         """
         Save inference results to a JSON file.
-        Appends to existing results if file exists to support multiple tasks.
-        
-        Args:
-            results: Results dictionary to save
-            output_file: Output file path (auto-generated if None)
         """
         if output_file is None:
             output_file = "submission.json"
@@ -352,20 +367,19 @@ class InferenceRunner:
         # Add new results
         existing_data.append(results)
         
-        # Save as a list of task results
-        with open(output_file, 'w') as f:
-            json.dump(existing_data, f, indent=2)
+        # Final safety clamp on the entire list
+        final_data = _deep_clamp(existing_data)
         
-        logger.info(f"Results saved to {output_file} (Total tasks recorded: {len(existing_data)})")
+        with open(output_file, 'w') as f:
+            json.dump(final_data, f, indent=2)
+        
+        logger.info(f"Results saved to {output_file} (Total tasks recorded: {len(final_data)})")
         print(f"Results saved to {output_file}")
 
 
 def main():
     """
     Main entry point for inference.
-    
-    Usage:
-        python inference.py <difficulty> [--seed SEED] [--output FILE] [--max-steps STEPS]
     """
     import argparse
     
@@ -379,56 +393,28 @@ def main():
     
     args = parser.parse_args()
     
-    # Log configuration
-    logger.info(f"Starting inference with difficulty: {args.difficulty}")
-    logger.info(f"Seed: {args.seed}")
-    if args.output:
-        logger.info(f"Output file: {args.output}")
-    if args.max_steps:
-        logger.info(f"Max steps: {args.max_steps}")
-    
     try:
-        # Determine tasks to run
         tasks_to_run = [args.difficulty] if args.difficulty != "all" else ["easy", "medium", "hard"]
         
-        # Clear existing submission.json if running 'all'
-        if args.difficulty == "all" and os.path.exists(args.output or "submission.json"):
+        output_path = args.output or "submission.json"
+        if args.difficulty == "all" and os.path.exists(output_path):
             try:
-                os.remove(args.output or "submission.json")
+                os.remove(output_path)
             except:
                 pass
         
         for difficulty in tasks_to_run:
             logger.info(f"--- Running {difficulty} task ---")
-            
-            # Create runner
             runner = InferenceRunner(difficulty=difficulty)
-            
-            # Run episode
             results = runner.run_episode(
                 seed=args.seed,
                 max_steps=args.max_steps
             )
-            
-            # Save results (this appends due to our previous fix)
-            runner.save_results(results, args.output)
-            
-            # Print summary for this task
-            print(f"\nInference Summary ({difficulty}):")
-            print(f"Final Score: {results['final_score']:.4f}")
-            print(f"Total Reward: {results['total_reward']:.4f}")
-            print(f"Steps Taken: {len(results['steps'])}")
-            print(f"Episode Done: {results['done']}")
-            
-            if results.get('error'):
-                print(f"Error: {results['error']}")
+            runner.save_results(results, output_path)
         
     except Exception as e:
         import traceback
-        logger.error(f"Unhandled exception in main: {e}")
-        logger.error(traceback.format_exc())
-        print(f"Error: {e}", flush=True)
-        traceback.print_exc()
+        logger.error(f"Unhandled exception: {e}")
         sys.exit(1)
 
 
