@@ -79,4 +79,4 @@ limits:
 
 security:
   requires_api_key: true
-  api_key_env_var: "OPENAI_API_KEY"
+  api_key_env_var: "API_KEY"
