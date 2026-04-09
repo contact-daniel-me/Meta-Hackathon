@@ -45,6 +45,10 @@ class EVChargingEnvironment:
         self.score = 0.001
         self.other_evs_waiting: List[Dict[str, Any]] = []
         
+    def _clamp_score(self, value: float) -> float:
+        """Clamp a score or reward to strictly (0.001, 0.999)."""
+        return max(0.001, min(0.999, float(value)))
+        
         # Performance tracking
         self.total_distance_traveled = 0.0
         self.total_waiting_time = 0.0
@@ -115,8 +119,11 @@ class EVChargingEnvironment:
         # Calculate final score if done
         if self.done:
             self.score = self._calculate_final_score()
+        else:
+            self.score = self._clamp_score(self.score)
         
-        # Create reward object
+        # Create reward object - apply strict clamping
+        reward_value = self._clamp_score(reward_value)
         reward = Reward(
             value=reward_value,
             breakdown=reward_breakdown,

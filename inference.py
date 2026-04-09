@@ -280,12 +280,15 @@ class InferenceRunner:
                     # Environment step
                     next_observation, reward, done, info = self.environment.step(action)
                     
-                    # Record step
+                    # Record step - ensure reward value is clamped
+                    reward_dict = reward.dict()
+                    reward_dict["value"] = _clamp_score(reward_dict["value"])
+                    
                     step_data = {
                         "step": step + 1,
                         "observation": observation.dict(),
                         "action": action.dict(),
-                        "reward": reward.dict(),
+                        "reward": reward_dict,
                         "done": done,
                         "info": info
                     }
