@@ -84,9 +84,12 @@ class EVChargingGrader:
         # Execute step
         observation, reward, done, info = self.environment.step(action)
 
+        reward_dict = reward.dict()
+        reward_dict["value"] = _clamp_score(reward_dict["value"])
+
         return {
             "observation": observation.dict(),
-            "reward": reward.dict(),
+            "reward": reward_dict,
             "done": done,
             "info": info,
             "step_count": self.environment.current_step
@@ -126,10 +129,15 @@ class EVChargingGrader:
         grade = _clamp_score(grade_task(final_state))
         final_score = _clamp_score(final_state.score)
 
+        # Clamp score field inside the serialised state dict as well
+        final_state_dict = final_state.dict()
+        if "score" in final_state_dict:
+            final_state_dict["score"] = _clamp_score(final_state_dict["score"])
+
         return {
             "setup": setup_info,
             "step_results": step_results,
-            "final_state": final_state.dict(),
+            "final_state": final_state_dict,
             "grade": grade,
             "final_score": final_score,
             "total_reward": _clamp_score(total_reward),
