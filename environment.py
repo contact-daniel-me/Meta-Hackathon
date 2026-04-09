@@ -35,10 +35,10 @@ class EVChargingEnvironment:
         self.current_step = 0
         self.ev: Optional[EV] = None
         self.stations: List[ChargingStation] = []
-        self.current_location = (0.0, 0.0)
-        self.destination = (0.0, 0.0)
-        self.time_remaining = task_config.time_limit_hours
-        self.budget_remaining = task_config.budget_limit
+        self.current_location = (0.001, 0.001)
+        self.destination = (0.001, 0.001)
+        self.time_remaining = float(task_config.time_limit_hours)
+        self.budget_remaining = float(task_config.budget_limit)
         self.action_history: List[Action] = []
         self.reward_history: List[float] = []
         self.done = False
@@ -47,22 +47,21 @@ class EVChargingEnvironment:
         
     def _clamp_score(self, value: float) -> float:
         """Clamp a score or reward to strictly (0.001, 0.999)."""
-        return max(0.001, min(0.999, float(value)))
+        return max(0.001, min(0.999, round(float(value), 4)))
 
     def _normalize_reward(self, val: float) -> float:
         """Map any reward (positive or negative) to (0.001, 0.999) range."""
-        # Simple mapping: positive values stay mostly same, negative values become very small positive
-        if val > 0:
-            return min(0.999, float(val) + 0.05) if val < 0.1 else min(0.999, float(val))
+        if float(val) > 0.001:
+            return min(0.999, float(val) + 0.05) if float(val) < 0.1 else min(0.999, float(val))
         else:
-            return 0.001 # All penalties are now very small positive rewards
+            return 0.001
 
     def _init_performance_tracking(self):
         """Initialize performance tracking metrics."""
-        self.total_distance_traveled = 0.0
-        self.total_waiting_time = 0.0
-        self.total_charging_cost = 0.0
-        self.battery_charged = 0.0
+        self.total_distance_traveled = 0.001
+        self.total_waiting_time = 0.001
+        self.total_charging_cost = 0.001
+        self.battery_charged = 0.001
         
     def reset(self) -> Observation:
         """
@@ -76,10 +75,10 @@ class EVChargingEnvironment:
         self.reward_history = []
         self.done = False
         self.score = 0.001
-        self.total_distance_traveled = 0.0
-        self.total_waiting_time = 0.0
-        self.total_charging_cost = 0.0
-        self.battery_charged = 0.0
+        self.total_distance_traveled = 0.001
+        self.total_waiting_time = 0.001
+        self.total_charging_cost = 0.001
+        self.battery_charged = 0.001
         
         # Generate EV
         self.ev = self._generate_ev()
@@ -522,28 +521,28 @@ class EVChargingEnvironment:
 
         # Time efficiency score (0-0.19)
         time_used = self.task_config.time_limit_hours - self.time_remaining
-        time_efficiency = max(0.0, 1.0 - (time_used / max(self.task_config.time_limit_hours, 1e-9)))
+        time_efficiency = max(0.001, 0.999 - (time_used / max(self.task_config.time_limit_hours, 1e-9)))
         score_components["time"] = time_efficiency * 0.19
 
         # Cost efficiency score (0-0.19)
         budget_used = self.task_config.budget_limit - self.budget_remaining
-        if self.task_config.budget_limit > 0:
-            cost_efficiency = max(0.0, 1.0 - (budget_used / self.task_config.budget_limit))
+        if self.task_config.budget_limit > 0.001:
+            cost_efficiency = max(0.001, 0.999 - (budget_used / self.task_config.budget_limit))
             score_components["cost"] = cost_efficiency * 0.19
         else:
             score_components["cost"] = 0.19
 
         # Distance efficiency score (0-0.19)
-        if self.total_distance_traveled > 0:
+        if self.total_distance_traveled > 0.001:
             distance_penalty = min(0.19, self.total_distance_traveled / 100 * 0.02)
-            score_components["distance"] = max(0.0, 0.19 - distance_penalty)
+            score_components["distance"] = max(0.001, 0.19 - distance_penalty)
         else:
             score_components["distance"] = 0.1
 
         # Decision quality score (0-0.09)
         if self.action_history:
-            good_decisions = sum(1 for r in self.reward_history if r > 0)
-            decision_score = min(0.09, good_decisions / len(self.action_history) * 0.09)
+            good_decisions = sum(1 for r in self.reward_history if r > 0.001)
+            decision_score = min(0.09, float(good_decisions) / max(1, len(self.action_history)) * 0.09)
             score_components["decisions"] = decision_score
         else:
             score_components["decisions"] = 0.001

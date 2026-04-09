@@ -96,8 +96,8 @@ class EVChargingGraders:
 
     @staticmethod
     def _clamp(score: float) -> float:
-        """Clamp score to strictly open interval (0, 1) as required by OpenEnv."""
-        return max(EVChargingGraders.SCORE_MIN, min(EVChargingGraders.SCORE_MAX, float(score)))
+        """Clamp score to strictly open interval (0.001, 0.999) as required by OpenEnv."""
+        return max(EVChargingGraders.SCORE_MIN, min(EVChargingGraders.SCORE_MAX, round(float(score), 4)))
 
     
     @staticmethod
@@ -220,10 +220,10 @@ class EVChargingGraders:
         task_config = environment_state.task_config
         
         # 1. Cost efficiency (30%)
-        cost_score = 0.0
+        cost_score = 0.001
         budget_used = task_config.budget_limit - obs.budget_remaining
-        if budget_used > 0:
-            cost_efficiency = max(0.0, 1.0 - (budget_used / task_config.budget_limit))
+        if budget_used > 0.001:
+            cost_efficiency = max(0.001, 0.999 - (budget_used / task_config.budget_limit))
             cost_score = cost_efficiency * 0.29  # cap sub-score at 0.29 to avoid exact 1.0 sums
         else:
             cost_score = 0.29  # No budget used — cap below max to prevent total reaching 1.0
@@ -231,10 +231,10 @@ class EVChargingGraders:
         score += cost_score
         
         # 2. Time efficiency (30%)
-        time_score = 0.0
+        time_score = 0.001
         time_used = task_config.time_limit_hours - obs.time_remaining_hours
-        if time_used > 0:
-            time_efficiency = max(0.0, 1.0 - (time_used / task_config.time_limit_hours))
+        if time_used > 0.001:
+            time_efficiency = max(0.001, 0.999 - (time_used / task_config.time_limit_hours))
             time_score = time_efficiency * 0.29  # cap sub-score at 0.29 to avoid exact 1.0 sums
         else:
             time_score = 0.29  # No time used — cap below max to prevent total reaching 1.0
