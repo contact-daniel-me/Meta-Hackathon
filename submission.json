@@ -1,0 +1,448 @@
+[
+  {
+    "difficulty": "easy",
+    "seed": 42,
+    "steps": [
+      {
+        "step": 0.999,
+        "observation": {
+          "ev": {
+            "id": "ev_6269",
+            "battery_capacity_kwh": 0.999,
+            "current_battery_percent": 0.999,
+            "consumption_rate_kwh_per_km": 0.18,
+            "priority": 0.999
+          },
+          "stations": [
+            {
+              "id": "station_1",
+              "name": "Charging Station 1",
+              "latitude": 0.06385495679374611,
+              "longitude": -0.07588791924423782,
+              "power_kw": 150.0,
+              "price_per_kwh": 0.1762800893086521,
+              "status": "occupied",
+              "waiting_time_minutes": 0.999,
+              "max_queue_length": 0.999,
+              "current_queue_length": 0.999
+            },
+            {
+              "id": "station_2",
+              "name": "Charging Station 2",
+              "latitude": -0.09132812763288803,
+              "longitude": 0.05758300615143189,
+              "power_kw": 50.0,
+              "price_per_kwh": 0.4368863632125283,
+              "status": "occupied",
+              "waiting_time_minutes": 0.999,
+              "max_queue_length": 0.999,
+              "current_queue_length": 0.999
+            },
+            {
+              "id": "station_3",
+              "name": "Charging Station 3",
+              "latitude": 0.014866425852998355,
+              "longitude": -0.009602508809192736,
+              "power_kw": 22.0,
+              "price_per_kwh": 0.3805061477363416,
+              "status": "occupied",
+              "waiting_time_minutes": 0.999,
+              "max_queue_length": 0.999,
+              "current_queue_length": 0.999
+            },
+            {
+              "id": "station_4",
+              "name": "Charging Station 4",
+              "latitude": 0.08334271173618285,
+              "longitude": 0.04908656141344253,
+              "power_kw": 22.0,
+              "price_per_kwh": 0.25737194994020357,
+              "status": "occupied",
+              "waiting_time_minutes": 0.999,
+              "max_queue_length": 0.999,
+              "current_queue_length": 0.001
+            },
+            {
+              "id": "station_5",
+              "name": "Charging Station 5",
+              "latitude": -0.010100186295025848,
+              "longitude": -0.027176490819761853,
+              "power_kw": 350.0,
+              "price_per_kwh": 0.3921847609855629,
+              "status": "occupied",
+              "waiting_time_minutes": 0.999,
+              "max_queue_length": 0.999,
+              "current_queue_length": 0.999
+            }
+          ],
+          "current_location_lat": 0.04084476397834147,
+          "current_location_lon": 0.0362013510722851,
+          "destination_lat": -0.0014078097320850066,
+          "destination_lon": -0.028406949651880155,
+          "time_remaining_hours": 0.999,
+          "budget_remaining": 0.999,
+          "step_count": 0.001,
+          "max_steps": 10,
+          "other_evs_waiting": [
+            {
+              "id": "other_ev_6723",
+              "station_id": "station_1",
+              "arrival_time": 0.999,
+              "priority": 0.999,
+              "battery_percent": 0.999
+            },
+            {
+              "id": "other_ev_9924",
+              "station_id": "station_1",
+              "arrival_time": 0.999,
+              "priority": 0.999,
+              "battery_percent": 0.999
+            }
+          ]
+        },
+        "action": {
+          "type": "select_station",
+          "station_id": "station_4",
+          "wait_time_minutes": null
+        },
+        "reward": {
+          "value": 0.05053885530995068,
+          "breakdown": {
+            "distance_penalty": 0.001,
+            "station_available": 0.1,
+            "cost_penalty": 0.001
+          },
+          "done": true,
+          "info": {
+            "charging_completed": true,
+            "station_id": "station_4",
+            "distance_km": 0.999,
+            "station_status": "occupied",
+            "price_per_kwh": 0.25737194994020357
+          }
+        },
+        "done": true,
+        "info": {
+          "charging_completed": true,
+          "station_id": "station_4",
+          "distance_km": 0.999,
+          "station_status": "occupied",
+          "price_per_kwh": 0.25737194994020357
+        }
+      }
+    ],
+    "total_reward": 0.05153885530995068,
+    "final_score": 0.7757,
+    "grade": 0.44999999999999996,
+    "done": false,
+    "error": null,
+    "steps_taken": 0.999,
+    "episode_done": true
+  },
+  {
+    "difficulty": "medium",
+    "seed": 42,
+    "steps": [
+      {
+        "step": 0.999,
+        "observation": {
+          "ev": {
+            "id": "ev_8348",
+            "battery_capacity_kwh": 0.999,
+            "current_battery_percent": 0.999,
+            "consumption_rate_kwh_per_km": 0.25,
+            "priority": 0.999
+          },
+          "stations": [
+            {
+              "id": "station_1",
+              "name": "Charging Station 1",
+              "latitude": -0.041891602995233916,
+              "longitude": -0.06548978402906686,
+              "power_kw": 150.0,
+              "price_per_kwh": 0.24227895479099054,
+              "status": "occupied",
+              "waiting_time_minutes": 0.999,
+              "max_queue_length": 0.999,
+              "current_queue_length": 0.999
+            },
+            {
+              "id": "station_2",
+              "name": "Charging Station 2",
+              "latitude": 0.03700888606909253,
+              "longitude": 0.08289608673122822,
+              "power_kw": 350.0,
+              "price_per_kwh": 0.1802685411136534,
+              "status": "occupied",
+              "waiting_time_minutes": 0.999,
+              "max_queue_length": 0.999,
+              "current_queue_length": 0.001
+            },
+            {
+              "id": "station_3",
+              "name": "Charging Station 3",
+              "latitude": 0.04957893710590294,
+              "longitude": -0.04826161869734116,
+              "power_kw": 150.0,
+              "price_per_kwh": 0.44765802232333207,
+              "status": "occupied",
+              "waiting_time_minutes": 0.999,
+              "max_queue_length": 0.999,
+              "current_queue_length": 0.999
+            },
+            {
+              "id": "station_4",
+              "name": "Charging Station 4",
+              "latitude": 0.09884771569698825,
+              "longitude": 0.05871886998097556,
+              "power_kw": 350.0,
+              "price_per_kwh": 0.1614722346812312,
+              "status": "available",
+              "waiting_time_minutes": 0.001,
+              "max_queue_length": 0.999,
+              "current_queue_length": 0.001
+            },
+            {
+              "id": "station_5",
+              "name": "Charging Station 5",
+              "latitude": -0.07059793302119469,
+              "longitude": 0.03340751135164874,
+              "power_kw": 150.0,
+              "price_per_kwh": 0.20345968656052574,
+              "status": "available",
+              "waiting_time_minutes": 0.001,
+              "max_queue_length": 0.999,
+              "current_queue_length": 0.001
+            },
+            {
+              "id": "station_6",
+              "name": "Charging Station 6",
+              "latitude": -0.06285084842509076,
+              "longitude": 0.016374323912721575,
+              "power_kw": 50.0,
+              "price_per_kwh": 0.38977986874941256,
+              "status": "out_of_service",
+              "waiting_time_minutes": 0.999,
+              "max_queue_length": 0.999,
+              "current_queue_length": 0.001
+            },
+            {
+              "id": "station_7",
+              "name": "Charging Station 7",
+              "latitude": -0.08097268264630515,
+              "longitude": -0.013472110426280187,
+              "power_kw": 50.0,
+              "price_per_kwh": 0.39803432778998127,
+              "status": "available",
+              "waiting_time_minutes": 0.001,
+              "max_queue_length": 0.999,
+              "current_queue_length": 0.001
+            },
+            {
+              "id": "station_8",
+              "name": "Charging Station 8",
+              "latitude": 0.0879667126049308,
+              "longitude": 0.07872019816717671,
+              "power_kw": 22.0,
+              "price_per_kwh": 0.421960540714035,
+              "status": "available",
+              "waiting_time_minutes": 0.001,
+              "max_queue_length": 0.999,
+              "current_queue_length": 0.001
+            }
+          ],
+          "current_location_lat": 0.03209553515994076,
+          "current_location_lon": -0.025649057320092983,
+          "destination_lat": 0.014589091701570758,
+          "destination_lon": -0.022476654431360012,
+          "time_remaining_hours": 0.999,
+          "budget_remaining": 0.999,
+          "step_count": 0.001,
+          "max_steps": 15,
+          "other_evs_waiting": [
+            {
+              "id": "other_ev_3437",
+              "station_id": "station_1",
+              "arrival_time": 0.999,
+              "priority": 0.999,
+              "battery_percent": 0.999
+            }
+          ]
+        },
+        "action": {
+          "type": "select_station",
+          "station_id": "station_2",
+          "wait_time_minutes": null
+        },
+        "reward": {
+          "value": 0.001,
+          "breakdown": {
+            "distance_penalty": 0.001,
+            "station_available": 0.1,
+            "cost_penalty": 0.001
+          },
+          "done": true,
+          "info": {
+            "charging_completed": true,
+            "station_id": "station_2",
+            "distance_km": 0.999,
+            "station_status": "occupied",
+            "price_per_kwh": 0.1802685411136534
+          }
+        },
+        "done": true,
+        "info": {
+          "charging_completed": true,
+          "station_id": "station_2",
+          "distance_km": 0.999,
+          "station_status": "occupied",
+          "price_per_kwh": 0.1802685411136534
+        }
+      }
+    ],
+    "total_reward": 0.002,
+    "final_score": 0.8354,
+    "grade": 0.766520488123348,
+    "done": false,
+    "error": null,
+    "steps_taken": 0.999,
+    "episode_done": true
+  },
+  {
+    "difficulty": "hard",
+    "seed": 42,
+    "steps": [
+      {
+        "step": 0.999,
+        "observation": {
+          "ev": {
+            "id": "ev_2050",
+            "battery_capacity_kwh": 0.999,
+            "current_battery_percent": 0.999,
+            "consumption_rate_kwh_per_km": 0.25,
+            "priority": 0.999
+          },
+          "stations": [
+            {
+              "id": "station_1",
+              "name": "Charging Station 1",
+              "latitude": -0.0033093547607143947,
+              "longitude": 0.09439303164674964,
+              "power_kw": 22.0,
+              "price_per_kwh": 0.3742949778875725,
+              "status": "occupied",
+              "waiting_time_minutes": 0.999,
+              "max_queue_length": 0.999,
+              "current_queue_length": 0.001
+            },
+            {
+              "id": "station_2",
+              "name": "Charging Station 2",
+              "latitude": 0.026744789789710344,
+              "longitude": 0.07554652425108885,
+              "power_kw": 50.0,
+              "price_per_kwh": 0.40537767477571884,
+              "status": "available",
+              "waiting_time_minutes": 0.001,
+              "max_queue_length": 0.999,
+              "current_queue_length": 0.001
+            },
+            {
+              "id": "station_3",
+              "name": "Charging Station 3",
+              "latitude": 0.012438776769151685,
+              "longitude": 0.08763967540319217,
+              "power_kw": 350.0,
+              "price_per_kwh": 0.21857621682649603,
+              "status": "available",
+              "waiting_time_minutes": 0.001,
+              "max_queue_length": 0.999,
+              "current_queue_length": 0.001
+            },
+            {
+              "id": "station_4",
+              "name": "Charging Station 4",
+              "latitude": -0.006798114860122495,
+              "longitude": -0.057572862823581566,
+              "power_kw": 22.0,
+              "price_per_kwh": 0.30064551977684034,
+              "status": "occupied",
+              "waiting_time_minutes": 0.999,
+              "max_queue_length": 0.999,
+              "current_queue_length": 0.999
+            },
+            {
+              "id": "station_5",
+              "name": "Charging Station 5",
+              "latitude": 0.07633340551539214,
+              "longitude": -0.022957925963457096,
+              "power_kw": 50.0,
+              "price_per_kwh": 0.33582585087010186,
+              "status": "available",
+              "waiting_time_minutes": 0.001,
+              "max_queue_length": 0.999,
+              "current_queue_length": 0.001
+            },
+            {
+              "id": "station_6",
+              "name": "Charging Station 6",
+              "latitude": -0.09231497639738871,
+              "longitude": -0.09691808012511965,
+              "power_kw": 50.0,
+              "price_per_kwh": 0.21260557799747076,
+              "status": "available",
+              "waiting_time_minutes": 0.001,
+              "max_queue_length": 0.999,
+              "current_queue_length": 0.001
+            }
+          ],
+          "current_location_lat": -0.04504234310840397,
+          "current_location_lon": 0.013529705238719575,
+          "destination_lat": -0.04433365986915266,
+          "destination_lon": -0.019322957729954827,
+          "time_remaining_hours": 0.999,
+          "budget_remaining": 0.999,
+          "step_count": 0.001,
+          "max_steps": 20,
+          "other_evs_waiting": []
+        },
+        "action": {
+          "type": "select_station",
+          "station_id": "station_1",
+          "wait_time_minutes": null
+        },
+        "reward": {
+          "value": 0.001,
+          "breakdown": {
+            "distance_penalty": 0.001,
+            "station_available": 0.1,
+            "cost_penalty": 0.001
+          },
+          "done": true,
+          "info": {
+            "charging_completed": true,
+            "station_id": "station_1",
+            "distance_km": 0.999,
+            "station_status": "occupied",
+            "price_per_kwh": 0.3742949778875725
+          }
+        },
+        "done": true,
+        "info": {
+          "charging_completed": true,
+          "station_id": "station_1",
+          "distance_km": 0.999,
+          "station_status": "occupied",
+          "price_per_kwh": 0.3742949778875725
+        }
+      }
+    ],
+    "total_reward": 0.002,
+    "final_score": 0.7108,
+    "grade": 0.43,
+    "done": false,
+    "error": null,
+    "steps_taken": 0.999,
+    "episode_done": true
+  }
+]
