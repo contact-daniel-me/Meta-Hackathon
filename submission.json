@@ -3,26 +3,26 @@
     "difficulty": "easy",
     "seed": 0.999,
     "grade": 0.85,
-    "total_reward": 0.0599,
-    "final_score": 0.8183,
+    "total_reward": 0.0711,
+    "final_score": 0.8256,
     "steps_taken": 0.999,
     "done": true
   },
   {
     "difficulty": "medium",
     "seed": 0.999,
-    "grade": 0.6621,
-    "total_reward": 0.0671,
-    "final_score": 0.7687,
+    "grade": 0.7638,
+    "total_reward": 0.0701,
+    "final_score": 0.8354,
     "steps_taken": 0.999,
     "done": true
   },
   {
     "difficulty": "hard",
     "seed": 0.999,
-    "grade": 0.24,
-    "total_reward": 0.0903,
-    "final_score": 0.5586,
+    "grade": 0.43,
+    "total_reward": 0.029,
+    "final_score": 0.8327,
     "steps_taken": 0.999,
     "done": true
   }
