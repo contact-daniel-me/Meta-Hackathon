@@ -18,7 +18,7 @@ from pydantic import ValidationError
 
 from models import Observation, Action, ActionType, TaskConfig
 from environment import EVChargingEnvironment
-from tasks import get_task_config
+from tasks import get_task_config, grade_task
 
 # Load environment variables from .env file
 load_dotenv()
@@ -293,9 +293,10 @@ class InferenceRunner:
                     episode_data["error"] = str(e)
                     break
             
-            # Get final state
+            # Get final state and grade
             final_state = self.environment.state()
             episode_data["final_score"] = final_state.score
+            episode_data["grade"] = grade_task(final_state)
             
             print("[END]")
             
@@ -315,7 +316,7 @@ class InferenceRunner:
             output_file: Output file path (auto-generated if None)
         """
         if output_file is None:
-            output_file = f"submission.json"
+            output_file = f"submission_{self.difficulty}.json"
         
         with open(output_file, 'w') as f:
             json.dump(results, f, indent=2)

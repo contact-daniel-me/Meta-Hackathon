@@ -192,7 +192,8 @@ class EVChargingGraders:
         
         score += action_efficiency
         
-        return min(1.0, max(0.0, score))
+        # Ensure score is strictly between 0 and 1 (OpenEnv requirement)
+        return min(0.999, max(0.001, score))
     
     @staticmethod
     def medium_grader(environment_state: EnvironmentState) -> float:
@@ -270,7 +271,8 @@ class EVChargingGraders:
         
         score += waiting_score
         
-        return min(1.0, max(0.0, score))
+        # Ensure score is strictly between 0 and 1 (OpenEnv requirement)
+        return min(0.999, max(0.001, score))
     
     @staticmethod
     def hard_grader(environment_state: EnvironmentState) -> float:
@@ -364,7 +366,8 @@ class EVChargingGraders:
         
         score += adaptation_score
         
-        return min(1.0, max(0.0, score))
+        # Ensure score is strictly between 0 and 1 (OpenEnv requirement)
+        return min(0.999, max(0.001, score))
     
     @staticmethod
     def _calculate_distance(loc1: Tuple[float, float], loc2: Tuple[float, float]) -> float:
