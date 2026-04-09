@@ -93,6 +93,15 @@ class EVChargingTasks:
 
 class EVChargingGraders:
     """Deterministic graders for evaluating task performance."""
+
+    SCORE_MIN = 0.001
+    SCORE_MAX = 0.999
+
+    @staticmethod
+    def _clamp(score: float) -> float:
+        """Clamp score to strictly open interval (0, 1) as required by OpenEnv."""
+        return max(EVChargingGraders.SCORE_MIN, min(EVChargingGraders.SCORE_MAX, float(score)))
+
     
     @staticmethod
     def easy_grader(environment_state: EnvironmentState) -> float:
@@ -193,7 +202,7 @@ class EVChargingGraders:
         score += action_efficiency
         
         # Ensure score is strictly between 0 and 1 (OpenEnv requirement)
-        return min(0.999, max(0.001, score))
+        return EVChargingGraders._clamp(score)
     
     @staticmethod
     def medium_grader(environment_state: EnvironmentState) -> float:
@@ -217,22 +226,22 @@ class EVChargingGraders:
         cost_score = 0.0
         budget_used = task_config.budget_limit - obs.budget_remaining
         if budget_used > 0:
-            cost_efficiency = 1 - (budget_used / task_config.budget_limit)
-            cost_score = cost_efficiency * 0.3
+            cost_efficiency = max(0.0, 1.0 - (budget_used / task_config.budget_limit))
+            cost_score = cost_efficiency * 0.29  # cap sub-score at 0.29 to avoid exact 1.0 sums
         else:
-            cost_score = 0.3  # Perfect if no budget used
-        
+            cost_score = 0.29  # No budget used — cap below max to prevent total reaching 1.0
+
         score += cost_score
         
         # 2. Time efficiency (30%)
         time_score = 0.0
         time_used = task_config.time_limit_hours - obs.time_remaining_hours
         if time_used > 0:
-            time_efficiency = 1 - (time_used / task_config.time_limit_hours)
-            time_score = time_efficiency * 0.3
+            time_efficiency = max(0.0, 1.0 - (time_used / task_config.time_limit_hours))
+            time_score = time_efficiency * 0.29  # cap sub-score at 0.29 to avoid exact 1.0 sums
         else:
-            time_score = 0.3  # Perfect if no time used
-        
+            time_score = 0.29  # No time used — cap below max to prevent total reaching 1.0
+
         score += time_score
         
         # 3. Distance consideration (20%)
@@ -272,7 +281,7 @@ class EVChargingGraders:
         score += waiting_score
         
         # Ensure score is strictly between 0 and 1 (OpenEnv requirement)
-        return min(0.999, max(0.001, score))
+        return EVChargingGraders._clamp(score)
     
     @staticmethod
     def hard_grader(environment_state: EnvironmentState) -> float:
@@ -326,12 +335,12 @@ class EVChargingGraders:
         # Success in competitive environment
         if environment_state.done and obs.ev.current_battery_percent >= 50:
             if other_evs_count >= 8:
-                resource_score = 0.25  # High competition
+                resource_score = 0.24  # High competition — capped at 0.24 to prevent exact 1.0
             elif other_evs_count >= 5:
-                resource_score = 0.2  # Medium competition
+                resource_score = 0.19  # Medium competition
             else:
-                resource_score = 0.15  # Low competition
-        
+                resource_score = 0.14  # Low competition
+
         score += resource_score
         
         # 3. Time management under pressure (25%)
@@ -339,14 +348,14 @@ class EVChargingGraders:
         time_remaining_ratio = obs.time_remaining_hours / task_config.time_limit_hours
         
         if time_remaining_ratio >= 0.5:
-            time_pressure_score = 0.25
+            time_pressure_score = 0.24  # capped at 0.24 to prevent exact 1.0 sums
         elif time_remaining_ratio >= 0.25:
             time_pressure_score = 0.15
         elif time_remaining_ratio >= 0.1:
             time_pressure_score = 0.1
         else:
             time_pressure_score = 0.05
-        
+
         score += time_pressure_score
         
         # 4. Strategic adaptation (20%)
@@ -358,16 +367,16 @@ class EVChargingGraders:
             action_variety.add(action.type.value)
         
         if len(action_variety) >= 3:
-            adaptation_score = 0.2  # Used multiple strategies
+            adaptation_score = 0.19  # capped at 0.19 to prevent exact 1.0 sums
         elif len(action_variety) >= 2:
             adaptation_score = 0.15  # Some adaptation
         else:
             adaptation_score = 0.05  # Minimal adaptation
-        
+
         score += adaptation_score
-        
+
         # Ensure score is strictly between 0 and 1 (OpenEnv requirement)
-        return min(0.999, max(0.001, score))
+        return EVChargingGraders._clamp(score)
     
     @staticmethod
     def _calculate_distance(loc1: Tuple[float, float], loc2: Tuple[float, float]) -> float:
@@ -400,15 +409,18 @@ def get_task_config(difficulty: str) -> TaskConfig:
 def grade_task(environment_state: EnvironmentState) -> float:
     """Grade task performance based on difficulty level."""
     difficulty = environment_state.task_config.difficulty
-    
+
     if difficulty == "easy":
-        return easy_grader(environment_state)
+        raw = easy_grader(environment_state)
     elif difficulty == "medium":
-        return medium_grader(environment_state)
+        raw = medium_grader(environment_state)
     elif difficulty == "hard":
-        return hard_grader(environment_state)
+        raw = hard_grader(environment_state)
     else:
         raise ValueError(f"Unknown difficulty level: {difficulty}")
+
+    # Final safety clamp — ensures score is ALWAYS strictly in (0, 1)
+    return max(0.001, min(0.999, float(raw)))
 
 
 # Top-level functions expected by openenv.yaml

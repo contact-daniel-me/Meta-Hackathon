@@ -36,6 +36,14 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+# ---------------------------------------------------------------------------
+# Score safety helper — enforces OpenEnv strict (0, 1) open-interval requirement
+# ---------------------------------------------------------------------------
+def _clamp_score(value: float) -> float:
+    """Clamp a score to strictly (0.001, 0.999) — never exactly 0 or 1."""
+    return max(0.001, min(0.999, float(value)))
+
+
 class EVChargingAgent:
     """
     AI agent for EV charging station selection using OpenAI API.
@@ -296,9 +304,10 @@ class InferenceRunner:
             
             # Get final state and grade
             final_state = self.environment.state()
-            episode_data["final_score"] = final_state.score
-            episode_data["grade"] = grade_task(final_state)
-            
+            episode_data["final_score"] = _clamp_score(final_state.score)
+            episode_data["grade"] = _clamp_score(grade_task(final_state))
+            episode_data["total_reward"] = _clamp_score(episode_data["total_reward"])
+
             print("[END]")
             
             return episode_data

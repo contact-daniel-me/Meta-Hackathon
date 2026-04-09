@@ -412,8 +412,8 @@ class EVChargingEnvironment:
         # Calculate charging time (simplified)
         charging_time_hours = energy_needed / station.power_kw
         
-        # Update EV battery
-        self.ev.current_battery_percent = min(100, self.ev.current_battery_percent + 50)
+        # Update EV battery — cap at 99.9 to prevent exact 1.0 in score calculations
+        self.ev.current_battery_percent = min(99.9, self.ev.current_battery_percent + 50)
         
         # Update budget and time
         charging_cost = energy_needed * station.price_per_kwh
@@ -491,44 +491,44 @@ class EVChargingEnvironment:
         return False
     
     def _calculate_final_score(self) -> float:
-        """Calculate final score (0-1)."""
+        """Calculate final score strictly in (0.001, 0.999) as required by OpenEnv."""
         score_components = {}
-        
-        # Battery level score (0-0.3)
+
+        # Battery level score (0-0.29) — capped below 0.30 to prevent sum reaching 1.0
         if self.ev:
-            battery_score = min(0.3, self.ev.current_battery_percent / 100 * 0.3)
+            battery_score = min(0.29, self.ev.current_battery_percent / 100 * 0.29)
             score_components["battery"] = battery_score
-        
-        # Time efficiency score (0-0.2)
+        else:
+            score_components["battery"] = 0.001
+
+        # Time efficiency score (0-0.19)
         time_used = self.task_config.time_limit_hours - self.time_remaining
-        time_efficiency = max(0, 1 - (time_used / self.task_config.time_limit_hours))
-        score_components["time"] = time_efficiency * 0.2
-        
-        # Cost efficiency score (0-0.2)
+        time_efficiency = max(0.0, 1.0 - (time_used / max(self.task_config.time_limit_hours, 1e-9)))
+        score_components["time"] = time_efficiency * 0.19
+
+        # Cost efficiency score (0-0.19)
         budget_used = self.task_config.budget_limit - self.budget_remaining
         if self.task_config.budget_limit > 0:
-            cost_efficiency = max(0, 1 - (budget_used / self.task_config.budget_limit))
-            score_components["cost"] = cost_efficiency * 0.2
+            cost_efficiency = max(0.0, 1.0 - (budget_used / self.task_config.budget_limit))
+            score_components["cost"] = cost_efficiency * 0.19
         else:
-            score_components["cost"] = 0.2
-        
-        # Distance efficiency score (0-0.2)
+            score_components["cost"] = 0.19
+
+        # Distance efficiency score (0-0.19)
         if self.total_distance_traveled > 0:
-            # Penalize excessive travel
-            distance_penalty = min(0.2, self.total_distance_traveled / 100 * 0.02)
-            score_components["distance"] = max(0, 0.2 - distance_penalty)
+            distance_penalty = min(0.19, self.total_distance_traveled / 100 * 0.02)
+            score_components["distance"] = max(0.0, 0.19 - distance_penalty)
         else:
             score_components["distance"] = 0.1
-        
-        # Decision quality score (0-0.1)
+
+        # Decision quality score (0-0.09)
         if self.action_history:
-            # Reward for good decisions
             good_decisions = sum(1 for r in self.reward_history if r > 0)
-            decision_score = min(0.1, good_decisions / len(self.action_history) * 0.1)
+            decision_score = min(0.09, good_decisions / len(self.action_history) * 0.09)
             score_components["decisions"] = decision_score
         else:
-            score_components["decisions"] = 0
-        
+            score_components["decisions"] = 0.001
+
         total_score = sum(score_components.values())
-        # Ensure score is strictly between 0 and 1 (OpenEnv requirement)
+        # Strictly enforce (0.001, 0.999) — never exactly 0 or 1
         return min(0.999, max(0.001, total_score))
