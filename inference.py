@@ -12,12 +12,16 @@ import logging
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 
+from dotenv import load_dotenv
 import openai
 from pydantic import ValidationError
 
 from models import Observation, Action, ActionType, TaskConfig
 from environment import EVChargingEnvironment
 from tasks import get_task_config
+
+# Load environment variables from .env file
+load_dotenv()
 
 
 # Configure logging
