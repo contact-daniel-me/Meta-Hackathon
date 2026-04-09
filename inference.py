@@ -45,13 +45,14 @@ class EVChargingAgent:
         """
         Initialize the agent using environment variables.
         """
-        api_key = os.getenv("OPENAI_API_KEY")
+        # Prioritize platform-provided API_KEY and API_BASE_URL
+        api_key = os.getenv("API_KEY") or os.getenv("OPENAI_API_KEY")
         api_base = os.getenv("API_BASE_URL")
         model = os.getenv("MODEL_NAME", "gpt-4")
         
         self.api_key_available = True
         if not api_key:
-            logger.warning("OPENAI_API_KEY environment variable not found. Agent will use fallback heuristic decisions.")
+            logger.warning("No API key found in API_KEY or OPENAI_API_KEY. Agent will use fallback heuristic decisions.")
             self.api_key_available = False
             api_key = "dummy-key-for-validation"
         
