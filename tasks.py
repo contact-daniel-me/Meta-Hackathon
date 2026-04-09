@@ -106,7 +106,7 @@ class EVChargingGraders:
         - Minimal unnecessary actions (10%)
         """
         if not environment_state.action_history:
-            return 0.0
+            return 0.001
         
         score = 0.0
         
@@ -178,7 +178,7 @@ class EVChargingGraders:
                 completion_score = 0.1
         else:
             # Partial credit for progress
-            if obs.ev.current_battery_percent > obs.ev.current_battery_percent:
+            if obs.ev.current_battery_percent > 20: # Fixed comparison
                 completion_score = 0.05
         
         score += completion_score
@@ -207,7 +207,7 @@ class EVChargingGraders:
         - Waiting time management (20%)
         """
         if not environment_state.action_history:
-            return 0.0
+            return 0.001
         
         score = 0.0
         obs = environment_state.observation
@@ -286,7 +286,7 @@ class EVChargingGraders:
         - Strategic adaptation (20%)
         """
         if not environment_state.action_history:
-            return 0.0
+            return 0.001
         
         score = 0.0
         obs = environment_state.observation

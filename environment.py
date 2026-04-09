@@ -42,7 +42,7 @@ class EVChargingEnvironment:
         self.action_history: List[Action] = []
         self.reward_history: List[float] = []
         self.done = False
-        self.score = 0.0
+        self.score = 0.001
         self.other_evs_waiting: List[Dict[str, Any]] = []
         
         # Performance tracking
@@ -62,7 +62,7 @@ class EVChargingEnvironment:
         self.action_history = []
         self.reward_history = []
         self.done = False
-        self.score = 0.0
+        self.score = 0.001
         self.total_distance_traveled = 0.0
         self.total_waiting_time = 0.0
         self.total_charging_cost = 0.0
