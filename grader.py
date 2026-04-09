@@ -96,10 +96,13 @@ class EVChargingGrader:
         reward_val = getattr(reward, 'value', reward) if hasattr(reward, 'value') else float(reward)
         clamped_reward_val = _clamp_score(reward_val)
         
-        # Update reward dict if it's an object
+        # Update reward dict and recursively clamp breakdown if it exists
         reward_dict = reward.dict() if hasattr(reward, "dict") else {"value": clamped_reward_val}
         reward_dict["value"] = clamped_reward_val
-        
+        if "breakdown" in reward_dict:
+            reward_dict["breakdown"] = {
+                k: _clamp_score(v) for k, v in reward_dict["breakdown"].items()
+            }
         return {
             "observation": observation.dict() if hasattr(observation, "dict") else str(observation),
             "reward": reward_dict,

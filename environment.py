@@ -48,6 +48,14 @@ class EVChargingEnvironment:
     def _clamp_score(self, value: float) -> float:
         """Clamp a score or reward to strictly (0.001, 0.999)."""
         return max(0.001, min(0.999, float(value)))
+
+    def _normalize_reward(self, val: float) -> float:
+        """Map any reward (positive or negative) to (0.001, 0.999) range."""
+        # Simple mapping: positive values stay mostly same, negative values become very small positive
+        if val > 0:
+            return min(0.999, val + 0.05) if val < 0.1 else min(0.999, val)
+        else:
+            return 0.001 # All penalties are now very small positive rewards
         
         # Performance tracking
         self.total_distance_traveled = 0.0
@@ -268,18 +276,21 @@ class EVChargingEnvironment:
             reward_value, reward_breakdown, info = self._handle_move_to_next()
         else:
             # Invalid action
-            reward_value = -0.1
-            reward_breakdown["invalid_action"] = -0.1
+            reward_value = 0.001
+            reward_breakdown["invalid_action"] = 0.001
             info["error"] = "Invalid action type"
         
-        return reward_value, reward_breakdown, info
+        # Normalize all values in the breakdown to be in (0.001, 0.999)
+        normalized_breakdown = {k: self._normalize_reward(v) for k, v in reward_breakdown.items()}
+        
+        return reward_value, normalized_breakdown, info
     
     def _handle_select_station(self, action: Action) -> Tuple[float, Dict[str, float], Dict[str, Any]]:
         """Handle station selection action."""
         info = {}
         station_id = action.station_id
         if not station_id:
-            return -0.05, {"no_station_selected": -0.05}, {"error": "No station selected"}
+            return 0.001, {"no_station_selected": 0.001}, {"error": "No station selected"}
         
         # Find station
         station = None
@@ -289,7 +300,7 @@ class EVChargingEnvironment:
                 break
         
         if not station:
-            return -0.05, {"station_not_found": -0.05}, {"error": "Station not found"}
+            return 0.001, {"station_not_found": 0.001}, {"error": "Station not found"}
         
         # Calculate distance
         distance_km = self._calculate_distance(
