@@ -309,19 +309,35 @@ class InferenceRunner:
     
     def save_results(self, results: Dict[str, Any], output_file: Optional[str] = None):
         """
-        Save inference results to file.
+        Save inference results to a JSON file.
+        Appends to existing results if file exists to support multiple tasks.
         
         Args:
-            results: Results to save
+            results: Results dictionary to save
             output_file: Output file path (auto-generated if None)
         """
         if output_file is None:
-            output_file = f"submission.json"
+            output_file = "submission.json"
         
+        existing_data = []
+        if os.path.exists(output_file):
+            try:
+                with open(output_file, 'r') as f:
+                    existing_data = json.load(f)
+                    if not isinstance(existing_data, list):
+                        existing_data = [existing_data]
+            except Exception as e:
+                logger.warning(f"Could not load existing {output_file}: {e}")
+                existing_data = []
+        
+        # Add new results
+        existing_data.append(results)
+        
+        # Save as a list of task results
         with open(output_file, 'w') as f:
-            json.dump(results, f, indent=2)
+            json.dump(existing_data, f, indent=2)
         
-        logger.info(f"Results saved to {output_file}")
+        logger.info(f"Results saved to {output_file} (Total tasks recorded: {len(existing_data)})")
         print(f"Results saved to {output_file}")
 
 
