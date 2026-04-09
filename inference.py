@@ -316,7 +316,7 @@ class InferenceRunner:
             output_file: Output file path (auto-generated if None)
         """
         if output_file is None:
-            output_file = f"submission_{self.difficulty}.json"
+            output_file = f"submission.json"
         
         with open(output_file, 'w') as f:
             json.dump(results, f, indent=2)

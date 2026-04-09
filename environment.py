@@ -530,4 +530,5 @@ class EVChargingEnvironment:
             score_components["decisions"] = 0
         
         total_score = sum(score_components.values())
-        return min(1.0, max(0.0, total_score))
+        # Ensure score is strictly between 0 and 1 (OpenEnv requirement)
+        return min(0.999, max(0.001, total_score))

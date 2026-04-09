@@ -399,17 +399,36 @@ def get_task_config(difficulty: str) -> TaskConfig:
 
 def grade_task(environment_state: EnvironmentState) -> float:
     """Grade task performance based on difficulty level."""
-    graders = EVChargingGraders()
     difficulty = environment_state.task_config.difficulty
     
     if difficulty == "easy":
-        return graders.easy_grader(environment_state)
+        return easy_grader(environment_state)
     elif difficulty == "medium":
-        return graders.medium_grader(environment_state)
+        return medium_grader(environment_state)
     elif difficulty == "hard":
-        return graders.hard_grader(environment_state)
+        return hard_grader(environment_state)
     else:
         raise ValueError(f"Unknown difficulty level: {difficulty}")
+
+
+# Top-level functions expected by openenv.yaml
+def get_easy_task():
+    return EVChargingTasks.get_easy_task()
+
+def get_medium_task():
+    return EVChargingTasks.get_medium_task()
+
+def get_hard_task():
+    return EVChargingTasks.get_hard_task()
+
+def easy_grader(state):
+    return EVChargingGraders.easy_grader(state)
+
+def medium_grader(state):
+    return EVChargingGraders.medium_grader(state)
+
+def hard_grader(state):
+    return EVChargingGraders.hard_grader(state)
 
 
 def run_task_episode(difficulty: str, seed: int = 42) -> Dict[str, Any]:
