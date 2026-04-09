@@ -315,3 +315,5 @@ Future enhancements planned:
 ---
 
 **Built with ❤️ for the EV charging community**
+#   S m a l l   f i x   f o r   g i t   s y n c  
+ 
