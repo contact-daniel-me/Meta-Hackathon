@@ -45,8 +45,11 @@ class EVChargingAgent:
         api_base = os.getenv("API_BASE_URL")
         model = os.getenv("MODEL_NAME", "gpt-4")
         
+        self.api_key_available = True
         if not api_key:
-            raise ValueError("OPENAI_API_KEY environment variable required")
+            logger.warning("OPENAI_API_KEY environment variable not found. Agent will use fallback heuristic decisions.")
+            self.api_key_available = False
+            api_key = "dummy-key-for-validation"
         
         # Configure OpenAI client
         client_kwargs = {"api_key": api_key}
@@ -141,6 +144,18 @@ Make the optimal decision based on this information.
         Returns:
             Selected action
         """
+        if not self.api_key_available:
+            # Fallback heuristic: Select the nearest available station or wait
+            available_stations = [s for s in observation.stations if s.status == 'available']
+            if available_stations:
+                # Simple distance-based selection
+                best_station = min(available_stations, key=lambda s: abs(s.latitude - observation.current_location_lat) + abs(s.longitude - observation.current_location_lon))
+                logger.info(f"Fallback heuristic: Selecting nearest station {best_station.id}")
+                return Action(type=ActionType.SELECT_STATION, station_id=best_station.id)
+            
+            logger.info("Fallback heuristic: No available stations, waiting.")
+            return Action(type=ActionType.WAIT, wait_time_minutes=10)
+
         try:
             # Format observation for prompt
             prompt = self._format_observation_for_prompt(observation)
