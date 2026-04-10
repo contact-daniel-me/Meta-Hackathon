@@ -9,14 +9,11 @@ import json
 import sys
 from typing import Dict, Any, Optional
 
-from dotenv import load_dotenv
 import openai
 
 from models import Observation, Action, ActionType
 from environment import EVChargingEnvironment
 from tasks import get_task_config, grade_task
-
-load_dotenv()
 
 
 def _clamp(val):
@@ -43,21 +40,29 @@ def _deep_clamp(obj):
 
 def _get_openai_client() -> openai.OpenAI:
     """
-    Create OpenAI client using the platform-injected environment variables.
+    Create OpenAI client using ONLY the platform-injected environment variables.
     The hackathon platform injects API_BASE_URL and API_KEY for their LiteLLM proxy.
-    Falls back to OPENAI_API_KEY / OPENAI_BASE_URL if platform vars are absent.
+    We MUST use these exclusively — no fallbacks to personal credentials.
     """
-    base_url = os.environ.get("API_BASE_URL") or os.environ.get("OPENAI_BASE_URL")
-    api_key = os.environ.get("API_KEY") or os.environ.get("OPENAI_API_KEY")
+    base_url = os.environ.get("API_BASE_URL", "")
+    api_key = os.environ.get("API_KEY", "")
+
+    # Log to stderr for debugging (stdout is reserved for structured output)
+    print(f"[DEBUG] API_BASE_URL = {base_url!r}", file=sys.stderr, flush=True)
+    print(f"[DEBUG] API_KEY present = {bool(api_key)}", file=sys.stderr, flush=True)
 
     if not api_key:
-        raise RuntimeError("No API key found. Set API_KEY or OPENAI_API_KEY.")
+        raise RuntimeError(
+            "API_KEY environment variable not found. "
+            "The platform must inject API_KEY and API_BASE_URL."
+        )
+    if not base_url:
+        raise RuntimeError(
+            "API_BASE_URL environment variable not found. "
+            "The platform must inject API_BASE_URL for the LiteLLM proxy."
+        )
 
-    kwargs = {"api_key": api_key}
-    if base_url:
-        kwargs["base_url"] = base_url
-
-    return openai.OpenAI(**kwargs)
+    return openai.OpenAI(api_key=api_key, base_url=base_url)
 
 
 class EVChargingAgent:
