@@ -73,22 +73,25 @@ class EVChargingAgent:
 
     def decide_action(self, observation: Observation) -> Action:
         """Use OpenAI API to decide the next action based on the observation."""
-        # Build a concise description of the current state
-        stations_info = []
-        for s in observation.stations:
-            stations_info.append(
-                f"  - {s.id}: status={s.status}, lat={s.latitude:.4f}, lon={s.longitude:.4f}, "
-                f"price=${s.price_per_kwh:.2f}/kWh, queue={s.queue_length}"
-            )
-        stations_text = "\n".join(stations_info) if stations_info else "  (none)"
+        try:
+            # Build a concise description of the current state
+            stations_info = []
+            for s in observation.stations:
+                stations_info.append(
+                    f"  - {s.id}: status={s.status.value}, "
+                    f"lat={float(s.latitude):.4f}, lon={float(s.longitude):.4f}, "
+                    f"price=${float(s.price_per_kwh):.2f}/kWh, "
+                    f"queue={s.current_queue_length}/{s.max_queue_length}"
+                )
+            stations_text = "\n".join(stations_info) if stations_info else "  (none)"
 
-        prompt = f"""You are an EV charging station optimizer. Pick the best action.
+            prompt = f"""You are an EV charging station optimizer. Pick the best action.
 
 Current EV state:
 - Battery: {observation.ev.current_battery_percent}%
-- Location: ({observation.current_location_lat:.4f}, {observation.current_location_lon:.4f})
-- Budget remaining: ${observation.budget_remaining:.2f}
-- Time remaining: {observation.time_remaining_hours:.2f} hours
+- Location: ({float(observation.current_location_lat):.4f}, {float(observation.current_location_lon):.4f})
+- Budget remaining: ${float(observation.budget_remaining):.2f}
+- Time remaining: {float(observation.time_remaining_hours):.2f} hours
 
 Available stations:
 {stations_text}
@@ -103,6 +106,9 @@ Respond with ONLY a JSON object, no other text:
 or {{"action": "wait", "minutes": 10}}
 or {{"action": "move_to_next_station"}}
 """
+        except Exception as e:
+            print(f"[WARN] Prompt build failed: {e}", file=sys.stderr, flush=True)
+            return self._heuristic_action(observation)
 
         try:
             response = self.client.chat.completions.create(
